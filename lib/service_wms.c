@@ -839,9 +839,20 @@ void _mapcache_service_wms_parse_request(mapcache_context *ctx, mapcache_service
       *request = (mapcache_request*)req_fi;
 
     } else if (isGetLegendGraphic) {
-      int i;
-      int x,y;
-
+      // Mandatory parameters: Service, Request, Version, Layer 
+      str = apr_table_get(params,"LAYER");
+      if(!str) {
+        errcode = 400;
+        errmsg = "received wms getlegendgraphic request with no layer parameter";
+        goto proxies;
+      }
+      str = apr_table_get(params,"VERSION");
+      if(!str) {
+        errcode = 400;
+        errmsg = "received wms getlegendgraphic request with no version parameter";
+        goto proxies;
+      }
+      
     }    
     
   }
