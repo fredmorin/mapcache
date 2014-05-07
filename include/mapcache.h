@@ -95,6 +95,7 @@ typedef struct mapcache_buffer mapcache_buffer;
 typedef struct mapcache_tile mapcache_tile;
 typedef struct mapcache_metatile mapcache_metatile;
 typedef struct mapcache_feature_info mapcache_feature_info;
+typedef struct mapcache_legend_graphic mapcache_legend_graphic;
 typedef struct mapcache_request_get_feature_info mapcache_request_get_feature_info;
 typedef struct mapcache_map mapcache_map;
 typedef struct mapcache_http_response mapcache_http_response;
@@ -288,6 +289,8 @@ struct mapcache_source {
   void (*render_map)(mapcache_context *ctx, mapcache_map *map);
 
   void (*query_info)(mapcache_context *ctx, mapcache_feature_info *fi);
+  
+  void (*query_legend)(mapcache_context *ctx, mapcache_legend_graphic *lg);
 
   void (*configuration_parse_xml)(mapcache_context *ctx, ezxml_t xml, mapcache_source * source);
   void (*configuration_check)(mapcache_context *ctx, mapcache_cfg *cfg, mapcache_source * source);
@@ -519,6 +522,7 @@ typedef enum {
   MAPCACHE_REQUEST_GET_MAP,
   MAPCACHE_REQUEST_GET_CAPABILITIES,
   MAPCACHE_REQUEST_GET_FEATUREINFO,
+  MAPCACHE_REQUEST_GET_LEGENDGRAPHIC,
   MAPCACHE_REQUEST_PROXY
 } mapcache_request_type;
 
@@ -591,6 +595,17 @@ struct mapcache_feature_info {
 struct mapcache_request_get_feature_info {
   mapcache_request request;
   mapcache_feature_info *fi;
+};
+
+struct mapcache_legend_graphic {
+  mapcache_map map;
+  char *format;  
+  mapcache_buffer *data;
+};
+
+struct mapcache_request_get_legend_graphic {
+  mapcache_request request;
+  mapcache_legend_graphic *lg;
 };
 
 struct mapcache_request_get_map {
@@ -1378,6 +1393,13 @@ mapcache_map* mapcache_tileset_map_clone(apr_pool_t *pool, mapcache_map *src);
 mapcache_feature_info* mapcache_tileset_feature_info_create(apr_pool_t *pool, mapcache_tileset *tileset,
     mapcache_grid_link *grid_link);
 
+	
+/**
+ * \brief create and initialize a feature_info for the given tileset and grid_link
+ */
+mapcache_legend_graphic* mapcache_tileset_legend_graphic_create(apr_pool_t *pool, mapcache_tileset *tileset,
+    mapcache_grid_link *grid_link);
+	
 /**
  * \brief create and initalize a tileset
  * @param pool

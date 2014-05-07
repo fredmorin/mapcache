@@ -852,7 +852,13 @@ void _mapcache_service_wms_parse_request(mapcache_context *ctx, mapcache_service
         errmsg = "received wms getlegendgraphic request with no version parameter";
         goto proxies;
       }
-      
+	  lg = mapcache_tileset_legend_graphic_create(ctx->pool, tileset, grid_link);
+	  lg->format = apr_pstrdup(ctx->pool,apr_table_get(params,"FORMAT"));
+	  req_lg = apr_pcalloc(ctx->pool, sizeof(mapcache_request_get_legend_info));
+	  req_lg->request.type = MAPCACHE_REQUEST_GET_LEGENDGRAPHIC;
+	  req_lg->lg = lg;
+	  *request = (mapcache_request*)req_lg;
+ 
     }    
     
   }
