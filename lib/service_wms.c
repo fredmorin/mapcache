@@ -330,7 +330,7 @@ void _mapcache_service_wms_parse_request(mapcache_context *ctx, mapcache_service
   int width=0, height=0;
   double *tmpbbox;
   mapcache_extent extent;
-  int isGetMap=0,iswms130=0;
+  int isGetMap=0,iswms130=0,isGetFeatureInfo=0,isGetLegendGraphic=0;
   int errcode = 200;
   char *errmsg = NULL;
   mapcache_service_wms *wms_service = (mapcache_service_wms*)this;
@@ -368,12 +368,15 @@ void _mapcache_service_wms_parse_request(mapcache_context *ctx, mapcache_service
     }
   } else {
     if( ! strcasecmp(str,"getcapabilities") ) {
+
       *request = (mapcache_request*)
                  apr_pcalloc(ctx->pool,sizeof(mapcache_request_get_capabilities_wms));
       (*request)->type = MAPCACHE_REQUEST_GET_CAPABILITIES;
       goto proxies; /* OK */
     } else if( ! strcasecmp(str,"getfeatureinfo") ) {
-      //nothing
+      isGetFeatureInfo = 1;
+    } else if( ! strcasecmp(str,"getlegendgraphic") ) {
+      isGetLegendGraphic = 1;
     } else {
       errcode = 501;
       errmsg = apr_psprintf(ctx->pool,"received wms with invalid request %s",str);
@@ -724,7 +727,7 @@ void _mapcache_service_wms_parse_request(mapcache_context *ctx, mapcache_service
         goto proxies;
       }
     }
-  } else {
+  } else if (isGetFeatureInfo) {
     int i;
     int x,y;
     mapcache_grid_link *grid_link;
@@ -835,7 +838,12 @@ void _mapcache_service_wms_parse_request(mapcache_context *ctx, mapcache_service
       req_fi->fi = fi;
       *request = (mapcache_request*)req_fi;
 
-    }
+    } else if (isGetLegendGraphic) {
+      int i;
+      int x,y;
+
+    }    
+    
   }
 
 proxies:
